@@ -5,11 +5,20 @@ import io
 import urllib.parse
 
 # --- KONFIGURACJA STRONY ---
-st.set_page_config(page_title="Olimpiada Szachowa OBS Overlay", layout="wide")
+st.set_page_config(
+    page_title="Olimpiada Szachowa OBS Overlay", 
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
-# --- PEŁNA BAZA FEDERACJI FIDE (3-LITEROWE KODY + PEŁNE NAZWY POL/ENG -> ISO-2) ---
+# --- ODCZYT PARAMETRÓW URL (DLA OBS) ---
+query_params = st.query_params
+url_from_param = query_params.get("url", "")
+country_from_param = query_params.get("country", "")
+is_obs_mode = query_params.get("obs", "false").lower() == "true"
+
+# --- BAZA KODÓW KRAJÓW DO FLAG (FIDE / IOC / ISO) ---
 ISO_CODES = {
-    # Wszystkie federacje FIDE (kody 3-literowe)
     "afg": "af", "alb": "al", "alg": "dz", "and": "ad", "ang": "ao", "ant": "ag", "arg": "ar", "arm": "am",
     "aru": "aw", "aus": "au", "aut": "at", "aze": "az", "bah": "bs", "ban": "bd", "bar": "bb", "mas": "my",
     "bdi": "bi", "bel": "be", "ben": "bj", "ber": "bm", "bhu": "bt", "bih": "ba", "biz": "bz", "blr": "by",
@@ -34,20 +43,9 @@ ISO_CODES = {
     "tjk": "tj", "tkm": "tm", "tls": "tl", "tto": "tt", "tun": "tn", "tur": "tr", "tpe": "tw", "uae": "ae",
     "uga": "ug", "ukr": "ua", "uru": "uy", "usa": "us", "uzb": "uz", "van": "vu", "ven": "ve", "vie": "vn",
     "wal": "gb-wales", "yem": "ye", "zam": "zm", "zim": "zw",
-
-    # Nazwy pełne (Polskie i Angielskie)
-    "poland": "pl", "polska": "pl", "germany": "de", "niemcy": "de", "france": "fr", "francja": "fr",
-    "spain": "es", "hiszpania": "es", "italy": "it", "włochy": "it", "ukraine": "ua", "ukraina": "ua",
-    "united states": "us", "stany zjednoczone": "us", "china": "cn", "chiny": "cn", "india": "in", "indie": "in",
-    "uzbekistan": "uz", "czech republic": "cz", "czechia": "cz", "czechy": "cz", "slovakia": "sk", "słowacja": "sk",
-    "hungary": "hu", "węgry": "hu", "romania": "ro", "rumunia": "ro", "serbia": "rs", "croatia": "hr",
-    "chorwacja": "hr", "slovenia": "si", "słowenia": "si", "greece": "gr", "grecja": "gr", "turkey": "tr",
-    "turcja": "tr", "israel": "il", "izrael": "il", "sudan": "sd", "norway": "no", "norwegia": "no",
-    "sweden": "se", "szwecja": "se", "finland": "fi", "finlandia": "fi", "denmark": "dk", "dania": "dk",
-    "england": "gb-eng", "anglia": "gb-eng", "armenia": "am", "azerbaijan": "az", "azerbejdżan": "az",
-    "georgia": "ge", "gruzja": "ge", "netherlands": "nl", "holandia": "nl", "kazakhstan": "kz", "kazachstan": "kz",
-    "brazil": "br", "brazylia": "br", "argentina": "ar", "argentyna": "ar", "peru": "pe", "venezuela": "ve",
-    "wenezuela": "ve"
+    "poland": "pl", "polska": "pl", "germany": "de", "france": "fr", "spain": "es", "italy": "it",
+    "ukraine": "ua", "united states": "us", "china": "cn", "india": "in", "uzbekistan": "uz",
+    "greece": "gr", "venezuela": "ve", "peru": "pe", "hungary": "hu"
 }
 
 def get_flag_img(country_name):
@@ -71,18 +69,29 @@ def shorten_name(name):
         return surname
     return name
 
-# --- STYLE CSS (Kompaktowy rozmiar dla 1/4 ekranu OBS) ---
-st.markdown("""
+# CSS: Ukrywanie sidebar w trybie OBS
+hide_sidebar_css = ""
+if is_obs_mode:
+    hide_sidebar_css = """
+        [data-testid="stSidebar"], [data-testid="collapsedControl"] {
+            display: none !important;
+        }
+    """
+
+# --- PEŁNA PRZEZROCZYSTOŚĆ DLA OBS ---
+st.markdown(f"""
     <style>
-    .stApp, .main, .block-container, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-        background-color: transparent !important;
+    /* Wymuszenie przezroczystości na wszystkich kontenerach nadrzędnych */
+    html, body, #root, .stApp, .main, .block-container, 
+    [data-testid="stAppViewContainer"], [data-testid="stHeader"], [data-testid="stToolbar"] {{
         background: transparent !important;
-    }
+        background-color: rgba(0, 0, 0, 0) !important;
+    }}
     
-    footer {visibility: hidden;}
+    footer {{visibility: hidden;}}
+    {hide_sidebar_css}
     
-    /* Zwięzła tabela z ograniczeniem szerokości do ćwiartki ekranu */
-    .obs-table {
+    .obs-table {{
         max-width: 680px !important;
         width: 100% !important;
         margin: 0 auto !important;
@@ -91,9 +100,9 @@ st.markdown("""
         color: #D3AF37 !important;
         font-size: 16px !important;
         table-layout: fixed !important;
-    }
+    }}
     
-    .title-row th {
+    .title-row th {{
         text-align: center !important;
         font-size: 11px !important;
         font-weight: bold !important;
@@ -102,13 +111,13 @@ st.markdown("""
         padding: 4px 0 2px 0 !important;
         opacity: 0.85 !important;
         border-bottom: 1px solid rgba(211, 175, 55, 0.25) !important;
-    }
+    }}
     
-    .country-edge {
+    .country-edge {{
         border-bottom: 2px solid #D3AF37 !important;
-    }
+    }}
     
-    .country-left-header {
+    .country-left-header {{
         text-align: left !important;
         font-size: 20px !important;
         font-weight: bold !important;
@@ -120,9 +129,9 @@ st.markdown("""
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
-    }
+    }}
     
-    .country-right-header {
+    .country-right-header {{
         text-align: right !important;
         font-size: 20px !important;
         font-weight: bold !important;
@@ -134,9 +143,9 @@ st.markdown("""
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
-    }
+    }}
     
-    .match-score-cell {
+    .match-score-cell {{
         text-align: center !important;
         font-size: 22px !important;
         font-weight: bold !important;
@@ -147,20 +156,20 @@ st.markdown("""
         border-left: 1px solid rgba(211, 175, 55, 0.25) !important;
         border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
         white-space: nowrap !important;
-    }
+    }}
     
-    .obs-table td {
+    .obs-table td {{
         border-bottom: 1px solid rgba(211, 175, 55, 0.2) !important;
         padding: 8px 0 !important;
         vertical-align: middle !important;
-    }
+    }}
     
-    .color-col {
+    .color-col {{
         text-align: center !important;
         font-size: 14px !important;
-    }
+    }}
     
-    .player-left {
+    .player-left {{
         text-align: left !important;
         padding-left: 10px !important;
         padding-right: 6px !important;
@@ -168,26 +177,26 @@ st.markdown("""
         overflow: hidden !important;
         text-overflow: ellipsis !important;
         border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
-    }
+    }}
     
-    .score-col {
+    .score-col {{
         text-align: center !important;
         font-weight: bold !important;
         font-size: 18px !important;
         border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
         white-space: nowrap !important;
-    }
+    }}
     
-    .player-right {
+    .player-right {{
         text-align: right !important;
         padding-right: 10px !important;
         padding-left: 6px !important;
         white-space: nowrap !important;
         overflow: hidden !important;
         text-overflow: ellipsis !important;
-    }
+    }}
     
-    .live-dot {
+    .live-dot {{
         height: 11px;
         width: 11px;
         background-color: #ff3333;
@@ -195,18 +204,18 @@ st.markdown("""
         display: inline-block;
         animation: blink 1.5s infinite;
         vertical-align: middle;
-    }
+    }}
     
-    @keyframes blink {
-        0% { opacity: 1; }
-        50% { opacity: 0.2; }
-        100% { opacity: 1; }
-    }
+    @keyframes blink {{
+        0% {{ opacity: 1; }}
+        50% {{ opacity: 0.2; }}
+        100% {{ opacity: 1; }}
+    }}
     
-    [data-testid="stSidebar"] {
+    [data-testid="stSidebar"] {{
         background-color: rgba(30, 30, 30, 0.95) !important;
         color: white !important;
-    }
+    }}
     </style>
 """, unsafe_allow_html=True)
 
@@ -216,25 +225,19 @@ def fetch_lichess_data(url):
     try:
         parsed_url = urllib.parse.urlparse(url)
         path_parts = parsed_url.path.strip('/').split('/')
-        
         if not path_parts:
             return []
-            
         round_id = path_parts[-1].split('#')[0]
         api_url = f"https://lichess.org/api/broadcast/round/{round_id}.pgn"
         response = requests.get(api_url)
-        
         if response.status_code != 200:
             return []
-            
         pgn_io = io.StringIO(response.text)
         games = []
-        
         while True:
             headers = chess.pgn.read_headers(pgn_io)
             if headers is None:
                 break
-                
             games.append({
                 "White": headers.get("White", "Nieznany"),
                 "Black": headers.get("Black", "Nieznany"),
@@ -248,21 +251,38 @@ def fetch_lichess_data(url):
     except Exception:
         return []
 
-# --- PANEL BOCZNY ---
-st.sidebar.title("Kreator Nakładki OBS")
-broadcast_url = st.sidebar.text_input("1. Link do transmisji Lichess", placeholder="https://lichess.org/broadcast/.../XJ8g9CkA")
-country_search = st.sidebar.text_input("2. Wyszukaj kraj (np. Venezuela)")
+# --- PANEL BOCZNY (KONTROLA) ---
+st.sidebar.title("⚙️ Sterowanie Nakładką")
+
+broadcast_url = st.sidebar.text_input(
+    "1. Link do transmisji Lichess", 
+    value=url_from_param, 
+    placeholder="https://lichess.org/broadcast/..."
+)
+
+country_search = st.sidebar.text_input(
+    "2. Wyszukaj kraj", 
+    value=country_from_param, 
+    placeholder="np. Greece lub VEN"
+)
+
+if broadcast_url and country_search:
+    encoded_url = urllib.parse.quote(broadcast_url)
+    encoded_country = urllib.parse.quote(country_search)
+    obs_generated_link = f"https://twoja-aplikacja.streamlit.app/?url={encoded_url}&country={encoded_country}&obs=true"
+    
+    st.sidebar.markdown("---")
+    st.sidebar.subheader("🔗 Link do wklejenia w OBS:")
+    st.sidebar.code(obs_generated_link, language="text")
 
 if st.sidebar.button("Odśwież dane"):
     st.cache_data.clear()
 
-# --- LOGIKA WYŚWIETLANIA ---
+# --- LOGIKA WYŚWIETLANIA NAKŁADKI ---
 if broadcast_url and country_search:
     games = fetch_lichess_data(broadcast_url)
-    
     if games:
         search_term = country_search.lower()
-        
         filtered_games = [
             g for g in games 
             if search_term in g['WhiteTeam'].lower() 
@@ -308,7 +328,6 @@ if broadcast_url and country_search:
                     left_player = shorten_name(g['White'])
                     left_elo = g['WhiteElo']
                     left_color = "⚪"
-                    
                     right_player = shorten_name(g['Black'])
                     right_elo = g['BlackElo']
                     right_color = "⚫"
@@ -321,7 +340,6 @@ if broadcast_url and country_search:
                     left_player = shorten_name(g['Black'])
                     left_elo = g['BlackElo']
                     left_color = "⚫"
-                    
                     right_player = shorten_name(g['White'])
                     right_elo = g['WhiteElo']
                     right_color = "⚪"
@@ -336,7 +354,6 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Wymuszony sztywny podział o szerokości maksymalnej 680px
             html_table = f"""<table class='obs-table'>
                 <colgroup>
                     <col style='width: 32px;'>
@@ -359,10 +376,12 @@ if broadcast_url and country_search:
             </table>"""
             
             st.markdown(html_table, unsafe_allow_html=True)
-            st.sidebar.success("Tabela zaktualizowana!")
+            if not is_obs_mode:
+                st.sidebar.success("Tabela zaktualizowana!")
         else:
             st.info(f"Brak meczu dla frazy: {country_search}")
     else:
         st.warning("Nie udało się pobrać danych.")
 else:
-    st.info("👈 Wpisz link do transmisji oraz nazwę kraju w panelu bocznym.")
+    if not is_obs_mode:
+        st.info("👈 Wpisz link do transmisji oraz nazwę kraju w panelu bocznym.")
