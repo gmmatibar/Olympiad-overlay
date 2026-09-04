@@ -46,7 +46,7 @@ def get_flag_img(country_name):
     name_clean = country_name.lower().strip()
     code = name_clean if len(name_clean) == 2 else ISO_CODES.get(name_clean)
     if code:
-        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 22px; border-radius: 3px; display: inline-block;">'
+        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 6px; height: 20px; border-radius: 2px; display: inline-block;">'
     return ""
 
 def shorten_name(name):
@@ -71,6 +71,7 @@ st.markdown("""
     
     footer {visibility: hidden;}
     
+    /* Wymuszenie sztywnego układu tabeli */
     .obs-table {
         width: 100%;
         border-collapse: collapse;
@@ -78,66 +79,79 @@ st.markdown("""
         color: #D3AF37 !important;
         font-size: 22px;
         margin-top: 5px;
-        table-layout: fixed;
+        table-layout: fixed !important;
     }
     
     /* Wiersz z napisem 'Aktualny wynik meczu' */
     .title-row th {
         text-align: center;
-        font-size: 15px;
+        font-size: 14px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 2px;
-        padding: 6px 0 2px 0;
+        padding: 4px 0;
         opacity: 0.9;
     }
     
-    /* Kraje i Główny Wynik */
-    .country-header {
-        text-align: center;
+    /* Nagłówki Państw nad zawodnikami */
+    .country-left-header {
+        text-align: left;
         font-size: 26px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 10px 4px;
+        padding: 8px 0;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
     
+    .country-right-header {
+        text-align: right;
+        font-size: 26px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 8px 0;
+        border-bottom: 3px solid #D3AF37;
+        vertical-align: middle;
+    }
+    
+    /* Komórka Głównego Wyniku Mecz */
     .match-score-cell {
         text-align: center;
-        font-size: 32px;
+        font-size: 30px;
         font-weight: bold;
-        padding: 8px 4px;
+        padding: 8px 0;
         border-bottom: 3px solid #D3AF37;
         background-color: rgba(211, 175, 55, 0.15);
         vertical-align: middle;
     }
     
+    .empty-header-col {
+        border-bottom: 3px solid #D3AF37;
+    }
+    
     /* Wiersze partii */
     .obs-table td {
         border-bottom: 1px solid rgba(211, 175, 55, 0.25);
-        padding: 8px 4px;
+        padding: 8px 0;
         vertical-align: middle;
     }
     
-    /* Wąskie kolumny na kulek kolorów */
+    /* Kolumny kulek kolorów */
     .color-col {
-        width: 35px !important;
         text-align: center;
         font-size: 18px;
     }
     
     .player-left {
         text-align: left;
-        padding-left: 8px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     
     .score-col {
-        width: 110px;
         text-align: center;
         font-weight: bold;
         font-size: 24px;
@@ -145,7 +159,6 @@ st.markdown("""
     
     .player-right {
         text-align: right;
-        padding-right: 8px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -300,15 +313,24 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Konstrukcja tabeli z dedykowanym pierwszym wierszem nagłówka
+            # Wymuszenie precyzyjnych szerokości kolumn poprzez colgroup
             html_table = f"""<table class='obs-table'>
+                <colgroup>
+                    <col style='width: 35px;'>
+                    <col style='width: 42%;'>
+                    <col style='width: 120px;'>
+                    <col style='width: 42%;'>
+                    <col style='width: 35px;'>
+                </colgroup>
                 <tr class='title-row'>
                     <th colspan='5'>Aktualny wynik meczu</th>
                 </tr>
                 <tr>
-                    <th colspan='2' class='country-header'>{get_flag_img(left_country)} {left_country}</th>
+                    <th class='empty-header-col'></th>
+                    <th class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
                     <th class='match-score-cell'>{score_str}</th>
-                    <th colspan='2' class='country-header'>{right_country} {get_flag_img(right_country)}</th>
+                    <th class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
+                    <th class='empty-header-col'></th>
                 </tr>
                 {rows_html}
             </table>"""
