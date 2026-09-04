@@ -52,7 +52,7 @@ def get_flag_img(country_name):
 def shorten_name(name):
     if not name:
         return ""
-    # Skracanie imienia tylko wtedy, gdy łączna długość ciągu przekracza 20 znaków
+    # Skracanie imienia tylko wtedy, gdy nazwisko i imię przekraczają 20 znaków
     if len(name) > 20 and ',' in name:
         parts = name.split(',', 1)
         surname = parts[0].strip()
@@ -72,7 +72,7 @@ st.markdown("""
     
     footer {visibility: hidden;}
     
-    /* Sztywna siatka tabeli */
+    /* Sztywny układ tabeli z włączonymi pionowymi liniami siatki */
     .obs-table {
         width: 100%;
         border-collapse: collapse;
@@ -92,16 +92,22 @@ st.markdown("""
         letter-spacing: 2px;
         padding: 6px 0 2px 0;
         opacity: 0.9;
+        border-bottom: 1px solid rgba(211, 175, 55, 0.25);
     }
     
-    /* Nagłówki Państw - wyrównanie nad zawodnikami */
+    /* Puste narożniki nagłówka dla zachowania kolumn z kropkami */
+    .country-edge {
+        border-bottom: 3px solid #D3AF37;
+    }
+    
+    /* Nagłówki Państw nad nazwiskami */
     .country-left-header {
         text-align: left;
         font-size: 26px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 10px 0 10px 12px;
+        padding: 10px 0 10px 16px;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
@@ -112,12 +118,12 @@ st.markdown("""
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 10px 12px 10px 0;
+        padding: 10px 16px 10px 0;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
     
-    /* Główny wynik meczu - idealnie nad wynikami partii */
+    /* Główny wynik meczu w tej samej kolumnie co wyniki partii */
     .match-score-cell {
         text-align: center;
         font-size: 30px;
@@ -126,15 +132,18 @@ st.markdown("""
         border-bottom: 3px solid #D3AF37;
         background-color: rgba(211, 175, 55, 0.15);
         vertical-align: middle;
+        border-left: 1px solid rgba(211, 175, 55, 0.25);
+        border-right: 1px solid rgba(211, 175, 55, 0.25);
     }
     
-    /* Komórki zawodników i wyników z oddechem (odstępami) */
+    /* Wiersze z wynikami */
     .obs-table td {
         border-bottom: 1px solid rgba(211, 175, 55, 0.25);
         padding: 12px 0;
         vertical-align: middle;
     }
     
+    /* Wąskie kolumny kulek kolorów */
     .color-col {
         text-align: center;
         font-size: 18px;
@@ -147,12 +156,14 @@ st.markdown("""
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        border-right: 1px solid rgba(211, 175, 55, 0.25);
     }
     
     .score-col {
         text-align: center;
         font-weight: bold;
         font-size: 24px;
+        border-right: 1px solid rgba(211, 175, 55, 0.25);
     }
     
     .player-right {
@@ -313,22 +324,24 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Precyzyjny układ 5-kolumnowy z idealnym scalaniem w nagłówku
+            # Bezpośrednie wykorzystanie 5 kolumn we wszystkich wierszach tabeli
             html_table = f"""<table class='obs-table'>
                 <colgroup>
-                    <col style='width: 38px;'>
-                    <col style='width: calc(50% - 108px);'>
-                    <col style='width: 140px;'>
-                    <col style='width: calc(50% - 108px);'>
-                    <col style='width: 38px;'>
+                    <col style='width: 35px;'>
+                    <col style='width: auto;'>
+                    <col style='width: 130px;'>
+                    <col style='width: auto;'>
+                    <col style='width: 35px;'>
                 </colgroup>
                 <tr class='title-row'>
                     <th colspan='5'>Aktualny wynik meczu</th>
                 </tr>
                 <tr>
-                    <th colspan='2' class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
+                    <th class='country-edge'></th>
+                    <th class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
                     <th class='match-score-cell'>{score_str}</th>
-                    <th colspan='2' class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
+                    <th class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
+                    <th class='country-edge'></th>
                 </tr>
                 {rows_html}
             </table>"""
