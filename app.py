@@ -46,13 +46,14 @@ def get_flag_img(country_name):
     name_clean = country_name.lower().strip()
     code = name_clean if len(name_clean) == 2 else ISO_CODES.get(name_clean)
     if code:
-        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 6px; height: 20px; border-radius: 2px; display: inline-block;">'
+        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 22px; border-radius: 2px; display: inline-block;">'
     return ""
 
 def shorten_name(name):
     if not name:
         return ""
-    if ',' in name:
+    # Skracanie imienia tylko wtedy, gdy łączna długość ciągu przekracza 20 znaków
+    if len(name) > 20 and ',' in name:
         parts = name.split(',', 1)
         surname = parts[0].strip()
         firstname = parts[1].strip()
@@ -71,7 +72,7 @@ st.markdown("""
     
     footer {visibility: hidden;}
     
-    /* Wymuszenie sztywnego układu tabeli */
+    /* Sztywna siatka tabeli */
     .obs-table {
         width: 100%;
         border-collapse: collapse;
@@ -82,25 +83,25 @@ st.markdown("""
         table-layout: fixed !important;
     }
     
-    /* Wiersz z napisem 'Aktualny wynik meczu' */
+    /* Wiersz górny: Aktualny wynik meczu */
     .title-row th {
         text-align: center;
         font-size: 14px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 2px;
-        padding: 4px 0;
+        padding: 6px 0 2px 0;
         opacity: 0.9;
     }
     
-    /* Nagłówki Państw nad zawodnikami */
+    /* Nagłówki Państw - wyrównanie nad zawodnikami */
     .country-left-header {
         text-align: left;
         font-size: 26px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 8px 0;
+        padding: 10px 0 10px 12px;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
@@ -111,34 +112,29 @@ st.markdown("""
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        padding: 8px 0;
+        padding: 10px 12px 10px 0;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
     
-    /* Komórka Głównego Wyniku Mecz */
+    /* Główny wynik meczu - idealnie nad wynikami partii */
     .match-score-cell {
         text-align: center;
         font-size: 30px;
         font-weight: bold;
-        padding: 8px 0;
+        padding: 10px 0;
         border-bottom: 3px solid #D3AF37;
         background-color: rgba(211, 175, 55, 0.15);
         vertical-align: middle;
     }
     
-    .empty-header-col {
-        border-bottom: 3px solid #D3AF37;
-    }
-    
-    /* Wiersze partii */
+    /* Komórki zawodników i wyników z oddechem (odstępami) */
     .obs-table td {
         border-bottom: 1px solid rgba(211, 175, 55, 0.25);
-        padding: 8px 0;
+        padding: 12px 0;
         vertical-align: middle;
     }
     
-    /* Kolumny kulek kolorów */
     .color-col {
         text-align: center;
         font-size: 18px;
@@ -146,6 +142,8 @@ st.markdown("""
     
     .player-left {
         text-align: left;
+        padding-left: 16px !important;
+        padding-right: 8px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -159,6 +157,8 @@ st.markdown("""
     
     .player-right {
         text-align: right;
+        padding-right: 16px !important;
+        padding-left: 8px !important;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -313,24 +313,22 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Wymuszenie precyzyjnych szerokości kolumn poprzez colgroup
+            # Precyzyjny układ 5-kolumnowy z idealnym scalaniem w nagłówku
             html_table = f"""<table class='obs-table'>
                 <colgroup>
-                    <col style='width: 35px;'>
-                    <col style='width: 42%;'>
-                    <col style='width: 120px;'>
-                    <col style='width: 42%;'>
-                    <col style='width: 35px;'>
+                    <col style='width: 38px;'>
+                    <col style='width: calc(50% - 108px);'>
+                    <col style='width: 140px;'>
+                    <col style='width: calc(50% - 108px);'>
+                    <col style='width: 38px;'>
                 </colgroup>
                 <tr class='title-row'>
                     <th colspan='5'>Aktualny wynik meczu</th>
                 </tr>
                 <tr>
-                    <th class='empty-header-col'></th>
-                    <th class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
+                    <th colspan='2' class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
                     <th class='match-score-cell'>{score_str}</th>
-                    <th class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
-                    <th class='empty-header-col'></th>
+                    <th colspan='2' class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
                 </tr>
                 {rows_html}
             </table>"""
