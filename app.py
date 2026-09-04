@@ -7,7 +7,7 @@ import urllib.parse
 # --- KONFIGURACJA STRONY ---
 st.set_page_config(page_title="Olimpiada Szachowa OBS Overlay", layout="wide")
 
-# --- ROZBUDOWANA BAZA KODÓW KRAJÓW DO FLAG (FIDE / IOC / ANGIELSKIE / POLSKIE) ---
+# --- BAZA KODÓW KRAJÓW DO FLAG (FIDE / IOC / ANGIELSKIE / POLSKIE) ---
 ISO_CODES = {
     # Kody 3-literowe FIDE / MOK
     "pol": "pl", "ger": "de", "fra": "fr", "esp": "es", "ita": "it", "ukr": "ua",
@@ -21,7 +21,8 @@ ISO_CODES = {
     "arm": "am", "aze": "az", "geo": "ge", "mda": "md", "ltu": "lt", "lat": "lv",
     "est": "ee", "blr": "by", "bul": "bg", "mkd": "mk", "mne": "me", "bih": "ba",
     "ned": "nl", "por": "pt", "aut": "at", "sui": "ch", "bel": "be", "dza": "dz",
-    "arg": "ar", "aus": "au", "ban": "bd", "mya": "mm", "kos": "xk",
+    "arg": "ar", "aus": "au", "ban": "bd", "mya": "mm", "kos": "xk", "per": "pe",
+    "ven": "ve", "ecu": "ec", "bol": "bo", "par": "py", "uru": "uy", "nzl": "nz",
     
     # Nazwy pełne (Angielskie i Polskie)
     "poland": "pl", "polska": "pl", "germany": "de", "niemcy": "de",
@@ -39,7 +40,7 @@ ISO_CODES = {
     "england": "gb-eng", "anglia": "gb-eng", "armenia": "am", "azerbaijan": "az", "azerbejdżan": "az",
     "georgia": "ge", "gruzja": "ge", "netherlands": "nl", "holandia": "nl",
     "kazakhstan": "kz", "kazachstan": "kz", "brazil": "br", "brazylia": "br",
-    "argentina": "ar", "argentyna": "ar"
+    "argentina": "ar", "argentyna": "ar", "peru": "pe"
 }
 
 def get_flag_img(country_name):
@@ -48,13 +49,12 @@ def get_flag_img(country_name):
     name_clean = country_name.lower().strip()
     code = name_clean if len(name_clean) == 2 else ISO_CODES.get(name_clean)
     if code:
-        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 20px; border-radius: 2px; display: inline-block;">'
+        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 6px; height: 20px; border-radius: 2px; display: inline-block;">'
     return ""
 
 def shorten_name(name):
     if not name:
         return ""
-    # Skracanie imienia tylko wtedy, gdy nazwisko i imię przekraczają 20 znaków
     if len(name) > 20 and ',' in name:
         parts = name.split(',', 1)
         surname = parts[0].strip()
@@ -74,115 +74,108 @@ st.markdown("""
     
     footer {visibility: hidden;}
     
-    /* Sztywny układ tabeli */
     .obs-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Arial', sans-serif;
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-family: 'Arial', sans-serif !important;
         color: #D3AF37 !important;
-        font-size: 22px;
-        margin-top: 5px;
+        font-size: 22px !important;
+        margin-top: 5px !important;
         table-layout: fixed !important;
     }
     
-    /* Wiersz górny: Aktualny wynik meczu */
     .title-row th {
-        text-align: center;
-        font-size: 14px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        padding: 6px 0 2px 0;
-        opacity: 0.9;
-        border-bottom: 1px solid rgba(211, 175, 55, 0.25);
+        text-align: center !important;
+        font-size: 14px !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        letter-spacing: 2px !important;
+        padding: 6px 0 2px 0 !important;
+        opacity: 0.9 !important;
+        border-bottom: 1px solid rgba(211, 175, 55, 0.25) !important;
     }
     
     .country-edge {
-        border-bottom: 3px solid #D3AF37;
+        border-bottom: 3px solid #D3AF37 !important;
     }
     
-    /* Wyrównanie Państwa po lewej: Nazwa -> Flaga (wyrównane do krawędzi nazwisk) */
     .country-left-header {
-        text-align: left;
-        font-size: 26px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 10px 0 10px 16px;
-        border-bottom: 3px solid #D3AF37;
-        vertical-align: middle;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-align: left !important;
+        font-size: 26px !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        padding: 10px 0 10px 16px !important;
+        border-bottom: 3px solid #D3AF37 !important;
+        vertical-align: middle !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
-    /* Wyrównanie Państwa po prawej: Flaga -> Nazwa (wyrównane do prawej krawędzi) */
     .country-right-header {
-        text-align: right;
-        font-size: 26px;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        padding: 10px 16px 10px 0;
-        border-bottom: 3px solid #D3AF37;
-        vertical-align: middle;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        text-align: right !important;
+        font-size: 26px !important;
+        font-weight: bold !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+        padding: 10px 16px 10px 0 !important;
+        border-bottom: 3px solid #D3AF37 !important;
+        vertical-align: middle !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
-    /* Główny wynik meczu - wyśrodkowany w poszerzonej kolumnie */
     .match-score-cell {
-        text-align: center;
-        font-size: 28px;
-        font-weight: bold;
-        padding: 10px 0;
-        border-bottom: 3px solid #D3AF37;
-        background-color: rgba(211, 175, 55, 0.15);
-        vertical-align: middle;
-        border-left: 1px solid rgba(211, 175, 55, 0.25);
-        border-right: 1px solid rgba(211, 175, 55, 0.25);
+        text-align: center !important;
+        font-size: 28px !important;
+        font-weight: bold !important;
+        padding: 10px 0 !important;
+        border-bottom: 3px solid #D3AF37 !important;
+        background-color: rgba(211, 175, 55, 0.15) !important;
+        vertical-align: middle !important;
+        border-left: 1px solid rgba(211, 175, 55, 0.25) !important;
+        border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
         white-space: nowrap !important;
     }
     
-    /* Wiersze z wynikami */
     .obs-table td {
-        border-bottom: 1px solid rgba(211, 175, 55, 0.25);
-        padding: 12px 0;
-        vertical-align: middle;
+        border-bottom: 1px solid rgba(211, 175, 55, 0.25) !important;
+        padding: 12px 0 !important;
+        vertical-align: middle !important;
     }
     
-    /* Kolumny kulek kolorów */
     .color-col {
-        text-align: center;
-        font-size: 18px;
+        text-align: center !important;
+        font-size: 18px !important;
     }
     
     .player-left {
-        text-align: left;
+        text-align: left !important;
         padding-left: 16px !important;
         padding-right: 8px !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        border-right: 1px solid rgba(211, 175, 55, 0.25);
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
     }
     
     .score-col {
-        text-align: center;
-        font-weight: bold;
-        font-size: 24px;
-        border-right: 1px solid rgba(211, 175, 55, 0.25);
+        text-align: center !important;
+        font-weight: bold !important;
+        font-size: 24px !important;
+        border-right: 1px solid rgba(211, 175, 55, 0.25) !important;
         white-space: nowrap !important;
     }
     
     .player-right {
-        text-align: right;
+        text-align: right !important;
         padding-right: 16px !important;
         padding-left: 8px !important;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     .live-dot {
@@ -249,7 +242,7 @@ def fetch_lichess_data(url):
 # --- PANEL BOCZNY ---
 st.sidebar.title("Kreator Nakładki OBS")
 broadcast_url = st.sidebar.text_input("1. Link do transmisji Lichess", placeholder="https://lichess.org/broadcast/.../XJ8g9CkA")
-country_search = st.sidebar.text_input("2. Wyszukaj kraj (np. Poland)")
+country_search = st.sidebar.text_input("2. Wyszukaj kraj (np. Peru)")
 
 if st.sidebar.button("Odśwież dane"):
     st.cache_data.clear()
@@ -334,23 +327,23 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Wymuszenie idealnej symetrii kolumn i szerokości 160px na wyniki
+            # Wymuszona ścisła siatka HTML dla 100% symetrii
             html_table = f"""<table class='obs-table'>
                 <colgroup>
-                    <col style='width: 38px;'>
-                    <col style='width: calc(50% - 118px);'>
+                    <col style='width: 45px;'>
+                    <col style='width: calc(50% - 125px);'>
                     <col style='width: 160px;'>
-                    <col style='width: calc(50% - 118px);'>
-                    <col style='width: 38px;'>
+                    <col style='width: calc(50% - 125px);'>
+                    <col style='width: 45px;'>
                 </colgroup>
                 <tr class='title-row'>
                     <th colspan='5'>Aktualny wynik meczu</th>
                 </tr>
                 <tr>
                     <th class='country-edge'></th>
-                    <th class='country-left-header'>{left_country} {get_flag_img(left_country)}</th>
-                    <th class='match-score-cell'>{score_str}</th>
-                    <th class='country-right-header'>{get_flag_img(right_country)} {right_country}</th>
+                    <th class='country-left-header' style='text-align: left !important;'>{left_country} {get_flag_img(left_country)}</th>
+                    <th class='match-score-cell' style='text-align: center !important;'>{score_str}</th>
+                    <th class='country-right-header' style='text-align: right !important;'>{get_flag_img(right_country)} {right_country}</th>
                     <th class='country-edge'></th>
                 </tr>
                 {rows_html}
