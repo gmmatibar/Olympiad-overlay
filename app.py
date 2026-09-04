@@ -7,37 +7,39 @@ import urllib.parse
 # --- KONFIGURACJA STRONY ---
 st.set_page_config(page_title="Olimpiada Szachowa OBS Overlay", layout="wide")
 
-# --- BAZA KODÓW KRAJÓW DO FLAG (FLAGCDN) ---
+# --- ROZBUDOWANA BAZA KODÓW KRAJÓW DO FLAG (FIDE / IOC / ANGIELSKIE / POLSKIE) ---
 ISO_CODES = {
-    "poland": "pl", "polska": "pl", "pol": "pl",
-    "sudan": "sd", "sud": "sd",
-    "usa": "us", "united states": "us",
-    "india": "in", "ind": "in",
-    "uzbekistan": "uz", "uzb": "uz",
-    "china": "cn", "chn": "cn",
-    "armenia": "am", "arm": "am",
-    "germany": "de", "ger": "de",
-    "ukraine": "ua", "ukr": "ua",
-    "azerbaijan": "az", "aze": "az",
-    "spain": "es", "esp": "es",
-    "france": "fr", "fra": "fr",
-    "netherlands": "nl", "ned": "nl",
-    "england": "gb-eng", "eng": "gb-eng",
-    "hungary": "hu", "hun": "hu",
-    "norway": "no", "nor": "no",
-    "israel": "il", "isr": "il",
-    "georgia": "ge", "geo": "ge",
-    "serbia": "rs", "srb": "rs",
-    "turkey": "tr", "tur": "tr",
-    "romania": "ro", "rou": "ro",
-    "greece": "gr", "gre": "gr",
-    "italy": "it", "ita": "it",
-    "czech republic": "cz", "cze": "cz",
-    "slovakia": "sk", "svk": "sk",
-    "kazakhstan": "kz", "kaz": "kz",
-    "vietnam": "vn", "vie": "vn",
-    "brazil": "br", "bra": "br",
-    "argentina": "ar", "arg": "ar"
+    # Kody 3-literowe FIDE / MOK
+    "pol": "pl", "ger": "de", "fra": "fr", "esp": "es", "ita": "it", "ukr": "ua",
+    "usa": "us", "chn": "cn", "ind": "in", "uzb": "uz", "cze": "cz", "svk": "sk",
+    "hun": "hu", "rou": "ro", "srb": "rs", "cro": "hr", "slo": "si", "gre": "gr",
+    "tur": "tr", "isr": "il", "egy": "eg", "rsa": "za", "bra": "br", "chi": "cl",
+    "col": "co", "mex": "mx", "cub": "cu", "can": "ca", "kor": "kr", "jpn": "jp",
+    "kaz": "kz", "mgl": "mn", "vie": "vn", "phi": "ph", "ina": "id", "sgp": "sg",
+    "sud": "sd", "nor": "no", "swe": "se", "fin": "fi", "den": "dk", "eng": "gb-eng",
+    "sco": "gb-scot", "wal": "gb-wales", "iri": "ir", "irq": "iq", "syr": "sy",
+    "arm": "am", "aze": "az", "geo": "ge", "mda": "md", "ltu": "lt", "lat": "lv",
+    "est": "ee", "blr": "by", "bul": "bg", "mkd": "mk", "mne": "me", "bih": "ba",
+    "ned": "nl", "por": "pt", "aut": "at", "sui": "ch", "bel": "be", "dza": "dz",
+    "arg": "ar", "aus": "au", "ban": "bd", "mya": "mm", "kos": "xk",
+    
+    # Nazwy pełne (Angielskie i Polskie)
+    "poland": "pl", "polska": "pl", "germany": "de", "niemcy": "de",
+    "france": "fr", "francja": "fr", "spain": "es", "hiszpania": "es",
+    "italy": "it", "włochy": "it", "ukraine": "ua", "ukraina": "ua",
+    "united states": "us", "stany zjednoczone": "us",
+    "china": "cn", "chiny": "cn", "india": "in", "indie": "in",
+    "uzbekistan": "uz", "czech republic": "cz", "czechia": "cz", "czechy": "cz",
+    "slovakia": "sk", "słowacja": "sk", "hungary": "hu", "węgry": "hu",
+    "romania": "ro", "rumunia": "ro", "serbia": "rs", "croatia": "hr", "chorwacja": "hr",
+    "slovenia": "si", "słowenia": "si", "greece": "gr", "grecja": "gr",
+    "turkey": "tr", "turcja": "tr", "israel": "il", "izrael": "il",
+    "sudan": "sd", "norway": "no", "norwegia": "no", "sweden": "se", "szwecja": "se",
+    "finland": "fi", "finlandia": "fi", "denmark": "dk", "dania": "dk",
+    "england": "gb-eng", "anglia": "gb-eng", "armenia": "am", "azerbaijan": "az", "azerbejdżan": "az",
+    "georgia": "ge", "gruzja": "ge", "netherlands": "nl", "holandia": "nl",
+    "kazakhstan": "kz", "kazachstan": "kz", "brazil": "br", "brazylia": "br",
+    "argentina": "ar", "argentyna": "ar"
 }
 
 def get_flag_img(country_name):
@@ -46,7 +48,7 @@ def get_flag_img(country_name):
     name_clean = country_name.lower().strip()
     code = name_clean if len(name_clean) == 2 else ISO_CODES.get(name_clean)
     if code:
-        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 22px; border-radius: 2px; display: inline-block;">'
+        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 20px; border-radius: 2px; display: inline-block;">'
     return ""
 
 def shorten_name(name):
@@ -72,7 +74,7 @@ st.markdown("""
     
     footer {visibility: hidden;}
     
-    /* Sztywny układ tabeli z włączonymi pionowymi liniami siatki */
+    /* Sztywny układ tabeli */
     .obs-table {
         width: 100%;
         border-collapse: collapse;
@@ -95,12 +97,11 @@ st.markdown("""
         border-bottom: 1px solid rgba(211, 175, 55, 0.25);
     }
     
-    /* Puste narożniki nagłówka dla zachowania kolumn z kropkami */
     .country-edge {
         border-bottom: 3px solid #D3AF37;
     }
     
-    /* Nagłówki Państw nad nazwiskami */
+    /* Wyrównanie Państwa po lewej: Nazwa -> Flaga (wyrównane do krawędzi nazwisk) */
     .country-left-header {
         text-align: left;
         font-size: 26px;
@@ -110,8 +111,12 @@ st.markdown("""
         padding: 10px 0 10px 16px;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
+    /* Wyrównanie Państwa po prawej: Flaga -> Nazwa (wyrównane do prawej krawędzi) */
     .country-right-header {
         text-align: right;
         font-size: 26px;
@@ -121,12 +126,15 @@ st.markdown("""
         padding: 10px 16px 10px 0;
         border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
-    /* Główny wynik meczu w tej samej kolumnie co wyniki partii */
+    /* Główny wynik meczu - wyśrodkowany w poszerzonej kolumnie */
     .match-score-cell {
         text-align: center;
-        font-size: 30px;
+        font-size: 28px;
         font-weight: bold;
         padding: 10px 0;
         border-bottom: 3px solid #D3AF37;
@@ -134,6 +142,7 @@ st.markdown("""
         vertical-align: middle;
         border-left: 1px solid rgba(211, 175, 55, 0.25);
         border-right: 1px solid rgba(211, 175, 55, 0.25);
+        white-space: nowrap !important;
     }
     
     /* Wiersze z wynikami */
@@ -143,7 +152,7 @@ st.markdown("""
         vertical-align: middle;
     }
     
-    /* Wąskie kolumny kulek kolorów */
+    /* Kolumny kulek kolorów */
     .color-col {
         text-align: center;
         font-size: 18px;
@@ -164,6 +173,7 @@ st.markdown("""
         font-weight: bold;
         font-size: 24px;
         border-right: 1px solid rgba(211, 175, 55, 0.25);
+        white-space: nowrap !important;
     }
     
     .player-right {
@@ -324,23 +334,23 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Bezpośrednie wykorzystanie 5 kolumn we wszystkich wierszach tabeli
+            # Wymuszenie idealnej symetrii kolumn i szerokości 160px na wyniki
             html_table = f"""<table class='obs-table'>
                 <colgroup>
-                    <col style='width: 35px;'>
-                    <col style='width: auto;'>
-                    <col style='width: 130px;'>
-                    <col style='width: auto;'>
-                    <col style='width: 35px;'>
+                    <col style='width: 38px;'>
+                    <col style='width: calc(50% - 118px);'>
+                    <col style='width: 160px;'>
+                    <col style='width: calc(50% - 118px);'>
+                    <col style='width: 38px;'>
                 </colgroup>
                 <tr class='title-row'>
                     <th colspan='5'>Aktualny wynik meczu</th>
                 </tr>
                 <tr>
                     <th class='country-edge'></th>
-                    <th class='country-left-header'>{get_flag_img(left_country)} {left_country}</th>
+                    <th class='country-left-header'>{left_country} {get_flag_img(left_country)}</th>
                     <th class='match-score-cell'>{score_str}</th>
-                    <th class='country-right-header'>{right_country} {get_flag_img(right_country)}</th>
+                    <th class='country-right-header'>{get_flag_img(right_country)} {right_country}</th>
                     <th class='country-edge'></th>
                 </tr>
                 {rows_html}
