@@ -3,7 +3,6 @@ import requests
 import chess.pgn
 import io
 import urllib.parse
-import textwrap
 
 # --- KONFIGURACJA STRONY ---
 st.set_page_config(page_title="Olimpiada Szachowa OBS Overlay", layout="wide")
@@ -44,12 +43,21 @@ ISO_CODES = {
 def get_flag_img(country_name):
     if not country_name:
         return ""
-    code = ISO_CODES.get(country_name.lower().strip())
+    
+    name_clean = country_name.lower().strip()
+    
+    # Obsługa dwuliterowych lub trzyliterowych skrótów z PGN
+    if len(name_clean) == 2:
+        code = name_clean
+    else:
+        code = ISO_CODES.get(name_clean)
+        
     if code:
-        return f'<img src="https://flagcdn.com/h32/{code}.png" style="vertical-align: middle; margin: 0 8px; height: 24px; border-radius: 3px;">'
+        # Zabezpieczenie onerror ukrywa ikonę zamiast pokazywać uszkodzony obrazek
+        return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 22px; border-radius: 3px; display: inline-block;">'
     return ""
 
-# --- STYLE CSS ---
+# --- STYLE CSS (OBS Overlay) ---
 st.markdown("""
     <style>
     .stApp, .main, .block-container, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
@@ -66,48 +74,58 @@ st.markdown("""
         color: #D3AF37 !important;
         font-size: 24px;
         margin-top: 10px;
+        table-layout: fixed;
     }
     
     .header-row th {
         border-bottom: 3px solid #D3AF37;
-        padding: 12px;
-        font-size: 30px;
+        padding: 10px 4px;
+        vertical-align: middle;
+    }
+    
+    .country-header {
+        text-align: center;
+        font-size: 28px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
     
-    .country-left {
-        text-align: left;
-        width: 40%;
-    }
-    
-    .match-score {
+    .score-header {
         text-align: center;
-        width: 20%;
-        font-size: 34px;
-        background-color: rgba(211, 175, 55, 0.15);
-        border-radius: 8px;
+        background-color: rgba(211, 175, 55, 0.12);
+        border-radius: 6px;
+        padding: 6px;
     }
     
-    .country-right {
-        text-align: right;
-        width: 40%;
+    .score-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        opacity: 0.85;
+        margin-bottom: 2px;
+        font-weight: normal;
+    }
+    
+    .score-val {
+        font-size: 32px;
+        font-weight: bold;
     }
     
     .obs-table td {
         border-bottom: 1px solid rgba(211, 175, 55, 0.25);
         padding: 10px 6px;
+        vertical-align: middle;
     }
     
     .color-col {
-        width: 5%;
+        width: 6%;
         text-align: center;
         font-size: 20px;
     }
     
     .player-left {
-        width: 35%;
+        width: 34%;
         text-align: left;
     }
     
@@ -119,7 +137,7 @@ st.markdown("""
     }
     
     .player-right {
-        width: 35%;
+        width: 34%;
         text-align: right;
     }
     
@@ -238,7 +256,6 @@ if broadcast_url and country_search:
                 
             score_str = f"{fmt_score(left_score)} - {fmt_score(right_score)}"
             
-            # Tworzenie HTML czystym ciągiem bez wcięć Markdown
             rows_html = ""
             for g in match_games:
                 if g['WhiteTeam'] == left_country:
@@ -263,7 +280,18 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            html_table = f"<table class='obs-table'><tr class='header-row'><th colspan='2' class='country-left'>{get_flag_img(left_country)} {left_country}</th><th class='match-score'>{score_str}</th><th colspan='2' class='country-right'>{right_country} {get_flag_img(right_country)}</th></tr>{rows_html}</table>"
+            # Nagłówek ze statycznymi szerokościami kolumn i opisem wyniku
+            html_table = f"""<table class='obs-table'>
+                <tr class='header-row'>
+                    <th colspan='2' class='country-header'>{get_flag_img(left_country)} {left_country}</th>
+                    <th class='score-header'>
+                        <div class='score-title'>Aktualny wynik meczu</div>
+                        <div class='score-val'>{score_str}</div>
+                    </th>
+                    <th colspan='2' class='country-header'>{right_country} {get_flag_img(right_country)}</th>
+                </tr>
+                {rows_html}
+            </table>"""
             
             st.markdown(html_table, unsafe_allow_html=True)
             st.sidebar.success("Tabela zaktualizowana!")
