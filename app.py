@@ -43,19 +43,23 @@ ISO_CODES = {
 def get_flag_img(country_name):
     if not country_name:
         return ""
-    
     name_clean = country_name.lower().strip()
-    
-    # Obsługa dwuliterowych lub trzyliterowych skrótów z PGN
-    if len(name_clean) == 2:
-        code = name_clean
-    else:
-        code = ISO_CODES.get(name_clean)
-        
+    code = name_clean if len(name_clean) == 2 else ISO_CODES.get(name_clean)
     if code:
-        # Zabezpieczenie onerror ukrywa ikonę zamiast pokazywać uszkodzony obrazek
         return f'<img src="https://flagcdn.com/w40/{code}.png" onerror="this.style.display=\'none\'" style="vertical-align: middle; margin: 0 8px; height: 22px; border-radius: 3px; display: inline-block;">'
     return ""
+
+def shorten_name(name):
+    if not name:
+        return ""
+    if ',' in name:
+        parts = name.split(',', 1)
+        surname = parts[0].strip()
+        firstname = parts[1].strip()
+        if firstname:
+            return f"{surname}, {firstname[0].upper()}."
+        return surname
+    return name
 
 # --- STYLE CSS (OBS Overlay) ---
 st.markdown("""
@@ -72,78 +76,84 @@ st.markdown("""
         border-collapse: collapse;
         font-family: 'Arial', sans-serif;
         color: #D3AF37 !important;
-        font-size: 24px;
-        margin-top: 10px;
+        font-size: 22px;
+        margin-top: 5px;
         table-layout: fixed;
     }
     
-    .header-row th {
-        border-bottom: 3px solid #D3AF37;
-        padding: 10px 4px;
-        vertical-align: middle;
+    /* Wiersz z napisem 'Aktualny wynik meczu' */
+    .title-row th {
+        text-align: center;
+        font-size: 15px;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 6px 0 2px 0;
+        opacity: 0.9;
     }
     
+    /* Kraje i Główny Wynik */
     .country-header {
         text-align: center;
-        font-size: 28px;
+        font-size: 26px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-    }
-    
-    .score-header {
-        text-align: center;
-        background-color: rgba(211, 175, 55, 0.12);
-        border-radius: 6px;
-        padding: 6px;
-    }
-    
-    .score-title {
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        opacity: 0.85;
-        margin-bottom: 2px;
-        font-weight: normal;
-    }
-    
-    .score-val {
-        font-size: 32px;
-        font-weight: bold;
-    }
-    
-    .obs-table td {
-        border-bottom: 1px solid rgba(211, 175, 55, 0.25);
-        padding: 10px 6px;
+        padding: 10px 4px;
+        border-bottom: 3px solid #D3AF37;
         vertical-align: middle;
     }
     
-    .color-col {
-        width: 6%;
+    .match-score-cell {
         text-align: center;
-        font-size: 20px;
+        font-size: 32px;
+        font-weight: bold;
+        padding: 8px 4px;
+        border-bottom: 3px solid #D3AF37;
+        background-color: rgba(211, 175, 55, 0.15);
+        vertical-align: middle;
+    }
+    
+    /* Wiersze partii */
+    .obs-table td {
+        border-bottom: 1px solid rgba(211, 175, 55, 0.25);
+        padding: 8px 4px;
+        vertical-align: middle;
+    }
+    
+    /* Wąskie kolumny na kulek kolorów */
+    .color-col {
+        width: 35px !important;
+        text-align: center;
+        font-size: 18px;
     }
     
     .player-left {
-        width: 34%;
         text-align: left;
+        padding-left: 8px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .score-col {
-        width: 20%;
+        width: 110px;
         text-align: center;
         font-weight: bold;
-        font-size: 26px;
+        font-size: 24px;
     }
     
     .player-right {
-        width: 34%;
         text-align: right;
+        padding-right: 8px !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     
     .live-dot {
-        height: 16px;
-        width: 16px;
+        height: 14px;
+        width: 14px;
         background-color: #ff3333;
         border-radius: 50%;
         display: inline-block;
@@ -259,16 +269,26 @@ if broadcast_url and country_search:
             rows_html = ""
             for g in match_games:
                 if g['WhiteTeam'] == left_country:
-                    left_player, left_elo, left_color = g['White'], g['WhiteElo'], "⚪"
-                    right_player, right_elo, right_color = g['Black'], g['BlackElo'], "⚫"
+                    left_player = shorten_name(g['White'])
+                    left_elo = g['WhiteElo']
+                    left_color = "⚪"
+                    
+                    right_player = shorten_name(g['Black'])
+                    right_elo = g['BlackElo']
+                    right_color = "⚫"
                     
                     if g['Result'] == '1-0': board_score = "1 - 0"
                     elif g['Result'] == '0-1': board_score = "0 - 1"
                     elif g['Result'] in ['1/2-1/2', '0.5-0.5', '½-½']: board_score = "½ - ½"
                     else: board_score = "<div class='live-dot'></div>"
                 else:
-                    left_player, left_elo, left_color = g['Black'], g['BlackElo'], "⚫"
-                    right_player, right_elo, right_color = g['White'], g['WhiteElo'], "⚪"
+                    left_player = shorten_name(g['Black'])
+                    left_elo = g['BlackElo']
+                    left_color = "⚫"
+                    
+                    right_player = shorten_name(g['White'])
+                    right_elo = g['WhiteElo']
+                    right_color = "⚪"
                     
                     if g['Result'] == '1-0': board_score = "0 - 1"
                     elif g['Result'] == '0-1': board_score = "1 - 0"
@@ -280,14 +300,14 @@ if broadcast_url and country_search:
                 
                 rows_html += f"<tr><td class='color-col'>{left_color}</td><td class='player-left'>{left_str}</td><td class='score-col'>{board_score}</td><td class='player-right'>{right_str}</td><td class='color-col'>{right_color}</td></tr>"
             
-            # Nagłówek ze statycznymi szerokościami kolumn i opisem wyniku
+            # Konstrukcja tabeli z dedykowanym pierwszym wierszem nagłówka
             html_table = f"""<table class='obs-table'>
-                <tr class='header-row'>
+                <tr class='title-row'>
+                    <th colspan='5'>Aktualny wynik meczu</th>
+                </tr>
+                <tr>
                     <th colspan='2' class='country-header'>{get_flag_img(left_country)} {left_country}</th>
-                    <th class='score-header'>
-                        <div class='score-title'>Aktualny wynik meczu</div>
-                        <div class='score-val'>{score_str}</div>
-                    </th>
+                    <th class='match-score-cell'>{score_str}</th>
                     <th colspan='2' class='country-header'>{right_country} {get_flag_img(right_country)}</th>
                 </tr>
                 {rows_html}
