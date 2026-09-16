@@ -1,3 +1,4 @@
 streamlit
 requests
-chess
+python-chess
+streamlit-autorefresh
