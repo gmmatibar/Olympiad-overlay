@@ -3,6 +3,7 @@ import requests
 import chess.pgn
 import io
 import urllib.parse
+from streamlit_autorefresh import st_autorefresh  # <- ZMIANA: Import automatycznego odświeżania
 
 # --- KONFIGURACJA STRONY ---
 st.set_page_config(
@@ -10,6 +11,10 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# --- AUTOMATYCZNE ODŚWIEŻANIE CO 60 SEKUND (1 MINUTA) ---
+# Interval podawany jest w milisekundach (60000 ms = 60 s)
+st_autorefresh(interval=60000, key="lichess_overlay_refresh")
 
 # --- ODCZYT PARAMETRÓW URL (DLA OBS) ---
 query_params = st.query_params
@@ -34,9 +39,9 @@ ISO_CODES = {
     "lao": "la", "lat": "lv", "lbn": "lb", "lbr": "lr", "lby": "ly", "lca": "lc", "les": "ls", "lie": "li",
     "ltu": "lt", "lux": "lu", "mad": "mg", "mar": "ma", "mda": "md", "mdv": "mv", "mex": "mx", "mgl": "mn",
     "mkd": "mk", "mli": "ml", "mlt": "mt", "mne": "me", "mon": "mc", "moz": "mz", "mri": "mu", "mtn": "mr",
-    "mya": "mm", "nam": "na", "nca": "ni", "ned": "nl", "nep": "np", "ngr": "ng", "nig": "ne", "nor": "no",
-    "nzl": "nz", "oma": "om", "pak": "pk", "pan": "pa", "par": "py", "per": "pe", "phi": "ph", "ple": "ps",
-    "plw": "pw", "png": "pg", "pol": "pl", "por": "pt", "puerto rico": "pr", "qat": "qa", "rou": "ro", "rsa": "za",
+    "mya": "mm", "nam": "na", "nca": "ni", "nep": "np", "ngr": "ng", "nig": "ne", "nor": "no", "nzl": "nz",
+    "oma": "om", "pak": "pk", "pan": "pa", "par": "py", "per": "pe", "phi": "ph", "ple": "ps", "plw": "pw",
+    "png": "pg", "pol": "pl", "por": "pt", "puerto rico": "pr", "qat": "qa", "rou": "ro", "rsa": "za",
     "rus": "ru", "rwa": "rw", "sam": "ws", "sco": "gb-scot", "sen": "sn", "sgp": "sg", "skn": "kn", "sle": "sl",
     "slo": "si", "smr": "sm", "sol": "sb", "som": "so", "srb": "rs", "sri": "lk", "sud": "sd", "sui": "ch",
     "sur": "sr", "svk": "sk", "swe": "se", "swz": "sz", "syr": "sy", "tan": "tz", "tga": "to", "tha": "th",
@@ -220,7 +225,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # --- POBIERANIE DANYCH ---
-@st.cache_data(ttl=15)
+@st.cache_data(ttl=55)  # <- ZMIANA: Zwiększono cache z 15s do 55s, aby dopasować do cyklu 1 minuty
 def fetch_lichess_data(url):
     try:
         parsed_url = urllib.parse.urlparse(url)
@@ -229,23 +234,29 @@ def fetch_lichess_data(url):
             return []
         round_id = path_parts[-1].split('#')[0]
         api_url = f"https://lichess.org/api/broadcast/round/{round_id}.pgn"
-        response = requests.get(api_url)
+        
+        # <- ZMIANA: Identyfikator aplikacji chroniący przed traktowaniem zapytania jako bot
+        headers = {
+            "User-Agent": "OlimpiadaSzachowaOBSOverlay/1.0 (Streamlit App)"
+        }
+        
+        response = requests.get(api_url, headers=headers)
         if response.status_code != 200:
             return []
         pgn_io = io.StringIO(response.text)
         games = []
         while True:
-            headers = chess.pgn.read_headers(pgn_io)
-            if headers is None:
+            headers_pgn = chess.pgn.read_headers(pgn_io)
+            if headers_pgn is None:
                 break
             games.append({
-                "White": headers.get("White", "Nieznany"),
-                "Black": headers.get("Black", "Nieznany"),
-                "WhiteElo": headers.get("WhiteElo", ""),
-                "BlackElo": headers.get("BlackElo", ""),
-                "WhiteTeam": headers.get("WhiteTeam", ""),
-                "BlackTeam": headers.get("BlackTeam", ""),
-                "Result": headers.get("Result", "*")
+                "White": headers_pgn.get("White", "Nieznany"),
+                "Black": headers_pgn.get("Black", "Nieznany"),
+                "WhiteElo": headers_pgn.get("WhiteElo", ""),
+                "BlackElo": headers_pgn.get("BlackElo", ""),
+                "WhiteTeam": headers_pgn.get("WhiteTeam", ""),
+                "BlackTeam": headers_pgn.get("BlackTeam", ""),
+                "Result": headers_pgn.get("Result", "*")
             })
         return games
     except Exception:
