@@ -36,7 +36,7 @@ ISO_CODES = {
     "mkd": "mk", "mli": "ml", "mlt": "mt", "mne": "me", "mon": "mc", "moz": "mz", "mri": "mu", "mtn": "mr",
     "mya": "mm", "nam": "na", "nca": "ni", "ned": "nl", "nep": "np", "ngr": "ng", "nig": "ne", "nor": "no",
     "nzl": "nz", "oma": "om", "pak": "pk", "pan": "pa", "par": "py", "per": "pe", "phi": "ph", "ple": "ps",
-    "plw": "pw", "png": "pg", "pol": "pl", "por": "pt", "puerto rico": "pr", "pur": "pr", "qat": "qa", "rou": "ro", "rsa": "za",
+    "plw": "pw", "png": "pg", "pol": "pl", "por": "pt", "puerto rico": "pur", "qat": "qa", "rou": "ro", "rsa": "za",
     "rus": "ru", "rwa": "rw", "sam": "ws", "sco": "gb-scot", "sen": "sn", "sgp": "sg", "skn": "kn", "sle": "sl",
     "slo": "si", "smr": "sm", "sol": "sb", "som": "so", "srb": "rs", "sri": "lk", "sud": "sd", "sui": "ch",
     "sur": "sr", "svk": "sk", "swe": "se", "swz": "sz", "syr": "sy", "tan": "tz", "tga": "to", "tha": "th",
