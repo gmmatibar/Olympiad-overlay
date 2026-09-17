@@ -45,7 +45,7 @@ ISO_CODES = {
     "rus": "ru", "rwa": "rw", "sam": "ws", "sco": "gb-scot", "sen": "sn", "sgp": "sg", "skn": "kn", "sle": "sl",
     "slo": "si", "smr": "sm", "sol": "sb", "som": "so", "srb": "rs", "sri": "lk", "sud": "sd", "sui": "ch",
     "sur": "sr", "svk": "sk", "swe": "se", "swz": "sz", "syr": "sy", "tan": "tz", "tga": "to", "tha": "th",
-    "tjk": "tj", "turkmenistam": "tm", "tkm": "tm", "tls": "tl", "tto": "tt", "tun": "tn", "tur": "tr", "tpe": "tw", "uae": "ae",
+    "tjk": "tj", "turkmenistan": "tm", "tkm": "tm", "tls": "tl", "tto": "tt", "tun": "tn", "tur": "tr", "tpe": "tw", "uae": "ae",
     "uga": "ug", "ukr": "ua", "uru": "uy", "usa": "us", "uzb": "uz", "van": "vu", "ven": "ve", "vie": "vn",
     "wal": "gb-wales", "yem": "ye", "zam": "zm", "zimbabwe": "zw", "zim": "zw",
     "poland": "pl", "polska": "pl", "germany": "de", "france": "fr", "spain": "es", "italy": "it",
