@@ -36,7 +36,7 @@ ISO_CODES = {
     "hai": "ht", "hon": "hn", "hkg": "hk", "hun": "hu", "ina": "id", "ind": "in", "ireland":"ie", "irl": "ie", "iri": "ir",
     "irq": "iq", "isl": "is", "isr": "il", "isv": "vi", "ita": "it", "ivb": "vg", "jam": "jm", "jor": "jo",
     "jpn": "jp", "kaz": "kz", "ken": "ke", "kgz": "kg", "kor": "kr", "kos": "xk", "ksa": "sa", "kuw": "kw",
-    "lao": "la", "lat": "lv", "lbn": "lb", "lbr": "lr", "lby": "ly", "lca": "lc", "les": "ls", "lie": "li",
+    "lao": "la", "latvia": "lv", "lat": "lv", "lbn": "lb", "lbr": "lr", "lby": "ly", "lca": "lc", "les": "ls", "lie": "li",
     "ltu": "lt", "lux": "lu", "mad": "mg", "mar": "ma", "mda": "md", "mdv": "mv", "mex": "mx", "mgl": "mn",
     "mkd": "mk", "mli": "ml", "mlt": "mt", "mne": "me", "mon": "mc", "moz": "mz", "mri": "mu", "mtn": "mr",
     "mya": "mm", "nam": "na", "nca": "ni", "nep": "np", "ngr": "ng", "nig": "ne", "nor": "no", "nzl": "nz",
