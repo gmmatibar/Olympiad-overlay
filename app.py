@@ -33,7 +33,7 @@ ISO_CODES = {
     "cze": "cz", "den": "dk", "dji": "dj", "dma": "dm", "dom": "do", "ecu": "ec", "egy": "eg", "eng": "gb-eng",
     "esp": "es", "est": "ee", "eth": "et", "fij": "fj", "fin": "fi", "fra": "fr", "fai": "fo", "gam": "gm",
     "georgia": "ge", "germany" : "de", "ger": "de", "gha": "gh", "gbr": "gb", "gre": "gr", "gua": "gt", "gui": "gn", "guy": "gy",
-    "hai": "ht", "hon": "hn", "hkg": "hk", "hun": "hu", "ina": "id", "ind": "in", "ireland":"ie", "irl": "ie", "iri": "ir",
+    "hai": "ht", "hon": "hn", "hkg": "hk", "hun": "hu", "ina": "id", "ind": "in", "ireland":"ie", "irl": "ie", "iran": "ir",
     "irq": "iq", "isl": "is", "isr": "il", "isv": "vi", "ita": "it", "ivb": "vg", "jam": "jm", "jor": "jo",
     "jpn": "jp", "kaz": "kz", "ken": "ke", "kgz": "kg", "kor": "kr", "kos": "xk", "ksa": "sa", "kuw": "kw",
     "lao": "la", "latvia": "lv", "lat": "lv", "lbn": "lb", "lbr": "lr", "lby": "ly", "lca": "lc", "les": "ls", "lie": "li",
